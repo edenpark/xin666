@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+{% load location_extras %}
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
+{% endblock %}
+{% block content %}  
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-3 col-sm-6">
+            <div class="card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="icon-big icon-warning text-center">
+                                <i class="ti-home"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="numbers">
+                                <p>The number of shopping malls</p>
+                                {{places}} 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="icon-big icon-success text-center">
+                                <i class="ti-server"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="numbers">
+                                <p>The number of total data</p>
+                                {{posts}} posts
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="icon-big icon-danger text-center">
+                                <i class="ti-harddrives"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="numbers">
+                                <p>The number of uncategorised data</p>
+                                {{uncategorised_posts}} posts
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="icon-big icon-info text-center">
+                                <i class="ti-user"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="numbers">
+                                <p>The number of users</p>
+                                {{users}} users
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        {% for stat in statistics %}
+        <div class="col-md-6">
+            <div class="card ">
+                <div class="header">
+                    <h4 class="title">2016 {{ stat.place.name }}</h4>
+                </div>
+                <div class="content">
+                    <canvas id="chartActivity{{stat.place.id}}"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">Categories Statistics</h4>
+                </div>
+                <div class="content">
+                    <canvas id="chartPreferences2"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">Weekday Statistics</h4>
+                </div>
+                <div class="content">
+                    <canvas id="chartPreferences5"></canvas>
+                </div>
+            </div>
+        </div>-->
+        <!--<div class="col-md-12">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">Hourly Statistics</h4>
+                </div>
+                <div class="content">
+                    <canvas id="chartPreferences6"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>-->
+    <!--<div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">Popluar 50 Days Table</h4>
+                    <p class="category">Regardless of Shopping mall</p>
+                </div>
+                <div class="content table-responsive table-full-width">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr><th></th>
+                            <th>Date</th>
+                            <th>The number of posts</th>
+                        </tr></thead>
+                        <tbody>
+                        {% for  stat in total_date_statistics %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ stat.created|date:"Y-m-d-D"}}</td>
+                                <td>{{ stat.count }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>-->
+        <!--<div class="col-md-6">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">Popluar 50 Days Table</h4>
+                    <p class="category">Each shopping mall</p>
+                </div>
+                <div class="content table-responsive table-full-width">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Date</th>
+                                <th>Shopping mall</th>
+                                <th>The number of posts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for  stat in date_statistics %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ stat.created|date:"Y-m-d-D"}}</td>
+                                <td>{{ stat.place__name|safe}}</td>
+                                <td>{{ stat.count }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>-->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">Province Statistics</h4>
+                    <p class="category">*Except '湖南'</p>
+                </div>
+                <div class="content">
+                    <canvas id="chartPreferences3"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">湖南 City Statistics</h4>
+                </div>
+                <div class="content">
+                    <canvas id="chartPreferences4"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">Gender Statistics</h4>
+                </div>
+                <div class="content">
+                    <canvas id="chartPreferences"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>-->
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+{% for stat in statistics %}
+var ctx{{stat.place.id}} = document.getElementById("chartActivity{{stat.place.id}}");
+var myChart{{stat.place.id}}  = new Chart(ctx{{stat.place.id}}, {
+    type: 'bar',
+    data: {
+        labels: [{% for s in stat.report %}"{{ s.month|date:'F' }}",{% endfor %}],
+        datasets: [{
+            label: '{{stat.place.name}}',
+            data: [{% for s in stat.report %}{{ s.pk__count }},{% endfor %}],
+            backgroundColor: [
+                'rgba(192, 57, 43, 0.5)',
+                'rgba(231, 76, 60, 0.5)',
+                'rgba(211, 84, 0, 0.5)',
+                'rgba(230, 126, 34, 0.5)',
+                'rgba(241, 196, 15, 0.5)',
+                'rgba(46, 204, 113, 0.5)',
+                'rgba(26, 188, 156, 0.5)',
+                'rgba(52, 152, 219, 0.5)',
+                'rgba(155, 89, 182, 0.5)',
+                'rgba(52, 73, 94, 0.5)',
+                'rgba(127, 140, 141, 0.5)'
+            ],
+            borderColor: [
+                'rgba(192, 57, 43, 1)',
+                'rgba(231, 76, 60, 1)',
+                'rgba(211, 84, 0, 1)',
+                'rgba(230, 126, 34, 1)',
+                'rgba(241, 196, 15, 1)',
+                'rgba(46, 204, 113, 1)',
+                'rgba(26, 188, 156, 1)',
+                'rgba(52, 152, 219, 1)',
+                'rgba(155, 89, 182, 1)',
+                'rgba(52, 73, 94, 1)',
+                'rgba(127, 140, 141, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+{% endfor %}
+
+// var cx6 = document.getElementById("chartPreferences6");
+// var myLineChart2 = new Chart(cx6, {
+//     type: 'line',
+//     data: {
+//         labels: [{% for stat in hour_statictics %}{{ stat.created }},{% endfor %}],
+//         datasets: [
+//             {
+//                 label: "Hourly Stats",
+//                 fill: false,
+//                 lineTension: 0.1,
+//                 backgroundColor: "rgba(155, 89, 182, 0.4)",
+//                 borderColor: "rgba(155, 89, 182, 1)",
+//                 borderCapStyle: 'butt',
+//                 borderDash: [],
+//                 borderDashOffset: 0.0,
+//                 borderJoinStyle: 'miter',
+//                 pointBorderColor: "rgba(155, 89, 182, 1)",
+//                 pointBackgroundColor: "#fff",
+//                 pointBorderWidth: 1,
+//                 pointHoverRadius: 5,
+//                 pointHoverBackgroundColor: "rgba(155, 89, 182, 1)",
+//                 pointHoverBorderColor: "rgba(220,220,220,1)",
+//                 pointHoverBorderWidth: 2,
+//                 pointRadius: 1,
+//                 pointHitRadius: 10,
+//                 data: [{% for stat in hour_statictics %}{{ stat.count }},{% endfor %}],
+//                 spanGaps: false,
+//             }
+//         ]        
+//     }
+// });
+
+
+// var cx5 = document.getElementById("chartPreferences5");
+// var myLineChart = new Chart(cx5, {
+//     type: 'line',
+//     data: {
+//         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+//         datasets: [
+//             {
+//                 label: "Weekday Stats",
+//                 fill: false,
+//                 lineTension: 0.1,
+//                 backgroundColor: "rgba(75,192,192,0.4)",
+//                 borderColor: "rgba(75,192,192,1)",
+//                 borderCapStyle: 'butt',
+//                 borderDash: [],
+//                 borderDashOffset: 0.0,
+//                 borderJoinStyle: 'miter',
+//                 pointBorderColor: "rgba(75,192,192,1)",
+//                 pointBackgroundColor: "#fff",
+//                 pointBorderWidth: 1,
+//                 pointHoverRadius: 5,
+//                 pointHoverBackgroundColor: "rgba(75,192,192,1)",
+//                 pointHoverBorderColor: "rgba(220,220,220,1)",
+//                 pointHoverBorderWidth: 2,
+//                 pointRadius: 1,
+//                 pointHitRadius: 10,
+//                 data: [{% for stat in weekday_statictics %}{{ stat.count }},{% endfor %}],
+//                 spanGaps: false,
+//             }
+//         ]        
+//     }
+// });
+
+var cx4 = document.getElementById("chartPreferences4");
+var myBarChart4 = new Chart(cx4, {
+    type: 'horizontalBar',
+    data: {
+        labels: [{% for stat in hunan_statistics %}"{{ stat.location }}",{% endfor %}],
+        datasets: [
+            {   
+                label: 'Hunan Cities',
+                data: [{% for stat in hunan_statistics %}{{ stat.count }},{% endfor %}],
+                backgroundColor: [
+                    "#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
+"#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
+"#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
+"#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
+"#DDEFFF", "#000035", "#7B4F4B", "#A1C299", "#300018", "#0AA6D8", "#013349", "#00846F",
+"#372101", "#FFB500", "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2", "#C2FF99", "#001E09",
+"#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68", "#7A87A1", "#788D66",
+"#885578", "#FAD09F", "#FF8A9A", "#D157A0", "#BEC459", "#456648", "#0086ED", "#886F4C",
+"#34362D", "#B4A8BD", "#00A6AA", "#452C2C", "#636375", "#A3C8C9", "#FF913F", "#938A81",
+"#575329", "#00FECF", "#B05B6F", "#8CD0FF", "#3B9700", "#04F757", "#C8A1A1", "#1E6E00",
+"#7900D7", "#A77500", "#6367A9", "#A05837", "#6B002C", "#772600", "#D790FF", "#9B9700",
+"#549E79", "#FFF69F", "#201625", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
+"#5B4534", "#FDE8DC", "#404E55", "#0089A3", "#CB7E98", "#A4E804", "#324E72", "#6A3A4C",
+                ],
+            }]
+    },
+    animation:{
+        animateScale:true
+    }
+});
+
+
+var cx3 = document.getElementById("chartPreferences3");
+var myBarChart3 = new Chart(cx3, {
+    type: 'bar',
+    data: {
+        labels: [{% for stat in users_statistics %}{% if not forloop.first %}"{{ stat.province|get_province }}",{% endif %}{% endfor %}],
+        datasets: [
+            {   
+                label: 'Provinces',
+                data: [{% for stat in users_statistics %}{% if not forloop.first %}{{ stat.count }},{% endif %}{% endfor %}],
+                backgroundColor: [
+                    "#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
+"#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
+"#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
+"#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
+"#DDEFFF", "#000035", "#7B4F4B", "#A1C299", "#300018", "#0AA6D8", "#013349", "#00846F",
+"#372101", "#FFB500", "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2", "#C2FF99", "#001E09",
+"#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68", "#7A87A1", "#788D66",
+"#885578", "#FAD09F", "#FF8A9A", "#D157A0", "#BEC459", "#456648", "#0086ED", "#886F4C",
+"#34362D", "#B4A8BD", "#00A6AA", "#452C2C", "#636375", "#A3C8C9", "#FF913F", "#938A81",
+"#575329", "#00FECF", "#B05B6F", "#8CD0FF", "#3B9700", "#04F757", "#C8A1A1", "#1E6E00",
+"#7900D7", "#A77500", "#6367A9", "#A05837", "#6B002C", "#772600", "#D790FF", "#9B9700",
+"#549E79", "#FFF69F", "#201625", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
+"#5B4534", "#FDE8DC", "#404E55", "#0089A3", "#CB7E98", "#A4E804", "#324E72", "#6A3A4C",
+                ],
+            }]
+    },
+    animation:{
+        animateScale:true
+    }
+});
+
+var cx2 = document.getElementById("chartPreferences2");
+var myDoughnutChart2 = new Chart(cx2, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for stat in ct_statistics %}"{{stat.category|safe}} {{stat.percentage}}% ({{stat.count}}) ",{% endfor %}],
+        datasets: [
+            {
+                data: [{% for stat in ct_statistics %}{{stat.percentage}},{% endfor %}],
+                backgroundColor: [
+                    "#023fa5", "#7d87b9", "#bec1d4", "#d6bcc0", "#bb7784", "#8e063b", "#4a6fe3", "#8595e1", "#b5bbe3", "#e6afb9", "#e07b91", "#d33f6a", "#11c638", "#8dd593", "#c6dec7", "#ead3c6", "#f0b98d", "#ef9708", "#0fcfc0", "#9cded6", "#d5eae7", "#f3e1eb", "#f6c4e1", "#f79cd4"
+                ],
+            }]
+    },
+    animation:{
+        animateScale:true
+    }
+});
+
+// var cx = document.getElementById("chartPreferences");
+// var myDoughnutChart = new Chart(cx, {
+//     type: 'doughnut',
+//     data: {
+//         labels: ['Femle', 'Male'],
+//         datasets: [
+//             {
+//                 data: [{{f_users}}, {{m_users}}],
+//                 backgroundColor: [
+//                     "#FF6384",
+//                     "#36A2EB",
+//                 ],
+//                 hoverBackgroundColor: [
+//                     "#FF6384",
+//                     "#36A2EB",
+//                 ]
+//             }]
+//     },
+//     animation:{
+//         animateScale:true
+//     }
+// });
+</script>
+{% endblock %}

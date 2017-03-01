@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static location_extras %}
+{% block head %}
+<link rel="stylesheet" type="text/css" media="screen" href="https://cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/a549aa8780dbda16f6cff545aeabc3d71073911e/build/css/bootstrap-datetimepicker.css">
+{% endblock %}
+{% block content %}
+<form action="" method="get" id="filter-form">
+    {% for field in form %}
+    <div class="form-group">
+    {% if field.name = "created" %}
+        <div class="input-group date" id="datetimepicker1">
+            <label for="id_created_0">Start Date </label>
+            <input data-format="yyyy-MM-dd hh:mm" id="id_created_0" name="created_0"type="text"></input>
+            <span class="input-group-addon"><span class="glyphicon-calendar glyphicon"></span></span>
+        </div>
+        <div class="input-group date">
+            <p> - </p>
+        </div>
+        <div class="input-group date" id="datetimepicker2">
+            <label for="id_created_1">End Date </label>
+            <input data-format="yyyy-MM-dd hh:mm" id="id_created_1" name="created_1" type="text"></input>
+            <span class="input-group-addon"><span class="glyphicon-calendar glyphicon"></span></span>
+        </div>
+    {% else %}
+    <label for="id_{{ field.name }}">{{ field.label|capfirst }}</label>
+    {{ field }}
+    {% endif %}
+    </div>
+    {% endfor %}
+    <input type="submit" class="btn btn-success"/>
+</form>
+    
+{% if filtered %}
+
+<h3>Total: {{ total_count }} posts</h3>
+<div id="thumb-section">
+    <div class="thumb-box">
+    {% for obj in filter %}
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" 
+        data-target="#myModal-{{obj.id}}" data-image="{{obj.weibo_img}}">
+          {% with page_num as page_num  %}{{ forloop.counter|post_page_num:page_num }}. {% endwith %}<img src="{{obj.weibo_thumb_img}}" alt="{{obj.id}}">
+        </button>
+        <!-- Modal -->
+        <div class="modal" id="myModal-{{obj.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">{{obj.created}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <h5>Place: </h5> <p>{{obj.place}}</p>
+                        </div>
+                        {% if obj.sub_place %}
+                        <div>
+                            <h5>Sub place: </h5> <p>{{obj.sub_place}}</p>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5>Location: </h5> <p>{{obj.user.location}}</p>
+                        </div>
+                        <div>
+                            <h5>Username: </h5> <p>{{obj.user.weibo_name}}</p>
+                        </div>
+                        <div>
+                            <h5>Gender: </h5> <p>{{obj.user.get_gender_display}}</p>
+                        </div>
+                        <div>
+                            <h5>Text: </h5> <p>{{obj.text}}</p>
+                        </div>
+                        <div>
+                            <h5>Category: </h5> <p class="category-field">{{obj.category}}</p>
+                        </div>
+                        <div>
+                            <h5>2nd Category: </h5> <p class="category-field">{{obj.second_category}}</p>
+                        </div>
+                         <div>
+                            <h5>3rd Category: </h5> <p class="category-field">{{obj.third_category}}</p>
+                        </div>
+                        <div>
+                            <h5>ID: </h5> <p>{{obj.id}}</p>
+                        </div>
+                        <hr>
+                        <form id="categorise-form-{{obj.id}}" action="{% url 'location:categorise_post' obj.place.id obj.id %}" method="POST">
+                            {% csrf_token %}
+                            {{ obj.category_form.as_p }}
+                            <div class="text-center">
+                                <input class="btn btn-info btn-fill btn-wd" type="submit" value="Update" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+<div class="pagination-section text-center">
+    {% if page_num != 1 %}
+    <a href="?{% prev_page_url request %}"><< Prev </a>
+    {% endif %}
+    <a href="?{% next_page_url request %}"> Next >></a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
+<script src="https://cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/a549aa8780dbda16f6cff545aeabc3d71073911e/src/js/bootstrap-datetimepicker.js"></script>
+<script type="text/javascript">
+$('#datetimepicker1').datetimepicker({
+    format: 'YYYY-MM-DD HH:mm'
+});
+$('#datetimepicker2').datetimepicker({
+    format: 'YYYY-MM-DD HH:mm'
+});
+
+$('form[id^=categorise-form-]').on('submit', function(event){
+    event.preventDefault();
+    catogorise_post($(this));
+});
+
+$('div[id^=myModal-]').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var image = button.data('image') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modalBody = $(this).find('.modal-body')
+    $('<img />', {
+        src: image,
+        width: '100%',
+    }).prependTo(modalBody)
+})
+</script>
+{% endblock %}

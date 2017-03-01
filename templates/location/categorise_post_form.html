@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<ul>
+	<li>{{obj.place.name}}</li>
+	<li>{{obj.user.weibo_name}} / {{obj.user.gender}}</li>
+	<li>{{obj.created}}</li>
+	<li>{{obj.text}}</li>
+	<li><img src="{{obj.weibo_img}}" alt="weibo image"></li>
+</ul>
+
+<form id="categorise-form-{{obj.id}}" action="{% url 'location:categorise_post' obj.place.id obj.id %}" method="POST">
+	{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Update" />
+</form>
+{% endblock %}
+{% block js %}
+<script>
+$('#categorise-form-{{obj.id}}').on('submit', function(event){
+    event.preventDefault();
+    console.log("form submitted!"); // sanity check
+    catogorise_post($(this));
+});
+</script>
+{% endblock %}

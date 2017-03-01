@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load location_extras %}
+{% block content %}
+<h2>{{place.name}}</h2>
+
+<!--<form id="export-post">
+	{% csrf_token %}
+    <div class="text-right">
+    	<input class="btn btn-info btn-fill btn-wd" type="submit" value="Export all post" />
+    </div>
+</form>-->
+
+<p>Total uncategorised posts : {{total_posts}} Posts</p>
+<br>
+<h3>Recent Uncategorised Posts</h3>
+<div id="thumb-section">
+	<div class="thumb-box">
+	
+	{% if main_dict %}
+		{% for item in main_dict %}
+		<!-- Button trigger modal -->
+		<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" 
+		data-target="#myModal-{{item.post.id}}" data-image="{{item.post.weibo_img}}">
+		  {% with page_num as page_num  %}{{ forloop.counter|post_page_num:page_num }}. {% endwith %}<img src="{{item.post.weibo_thumb_img}}" width="60" alt="{{item.post.id}}">
+		</button>
+		<!-- Modal -->
+		<div class="modal" id="myModal-{{item.post.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="myModalLabel">{{item.post.created}}</h4>
+					</div>
+					<div class="modal-body">
+						<div>
+							<h5>Place: </h5> <p>{{item.post.place}}</p>
+						</div>
+						{% if item.post.sub_place %}
+                        <div>
+                            <h5>Sub place: </h5> <p>{{item.post.sub_place}}</p>
+                        </div>
+                        {% endif %}
+						<div>
+							<h5>Location: </h5> <p>{{item.post.user.location}}</p>
+						</div>
+						<div>
+							<h5>Username: </h5> <p>{{item.post.user.weibo_name}}</p>
+						</div>
+						<div>
+							<h5>Gender: </h5> <p>{{item.post.user.get_gender_display}}</p>
+						</div>
+						<div>
+							<h5>Text: </h5> <p>{{item.post.text}}</p>
+						</div>
+						<div>
+							<h5>Category: </h5> <p class="category-field">{% if item.post.category %}{{item.post.category}}{% else %}
+							-
+							{% endif %}</p>
+						</div>
+						<div>
+                            <h5>2nd Category: </h5> <p class="category-field">{% if item.post.category %}{{item.post.second_category}}{% else %}
+							-
+							{% endif %}</p>
+                        </div>
+                         <div>
+                            <h5>3rd Category: </h5> <p class="category-field">{% if item.post.category %}{{item.post.third_category}}{% else %}
+							-
+							{% endif %}</p>
+                        </div>
+						<div>
+							<h5>ID: </h5> <p>{{item.post.id}}</p>
+						</div>
+						<hr>
+						<form id="categorise-form-{{item.post.id}}" action="{% url 'location:categorise_post' item.post.place.id item.post.id %}" method="POST">
+							{% csrf_token %}
+						    {{ item.form.as_p }}
+						    <div class="text-center">
+						    	<input class="btn btn-info btn-fill btn-wd" type="submit" value="Update" />
+						    </div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+			<!--<a href="{% url 'location:categorise_post' place.id item.post.id %}">
+				<img src="{{item.post.weibo_thumb_img}}" alt="{{item.post.id}}">
+			</a>-->
+		{% endfor %}
+	{% else %}
+		<h4>Sorry, there is no result.</h4>
+	{% endif %}
+	</div>
+</div>
+
+<div class="pagination-section text-center">
+	{% if page_num != 1 %}
+	<a href="?page={{ page_num|add:"-1" }}"><< Prev </a>
+	{% endif %}
+	<a href="?page={{ page_num|add:"1" }}"> Next >></a>
+</div>
+<div class="alert alert-success hide">
+    <button type="button" aria-hidden="true" class="close">×</button>
+    <span><b> Success - </b> This is a regular notification made with ".alert-success"</span>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+$('form[id^=categorise-form-]').on('submit', function(event){
+    event.preventDefault();
+    catogorise_post($(this));
+});
+
+$('form#export-post').on('submit', function(event){
+    event.preventDefault();
+    console.log('clicked');
+    ajax_download($(this));
+});
+
+$('div[id^=myModal-]').on('show.bs.modal', function (event) {
+	var button = $(event.relatedTarget) // Button that triggered the modal
+	var image = button.data('image') // Extract info from data-* attributes
+	// If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+	// Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+	var modalBody = $(this).find('.modal-body')
+	$('<img />', {
+	    src: image,
+	    width: '100%',
+	}).prependTo(modalBody)
+})
+</script>
+{% endblock %}
