@@ -15,6 +15,6 @@ Project for the university of Auckland, Architecture dept.
 - PostgreSQL
 - Deployed on Heroku
 
-### This project moved from XIN-666 to move to heroku and use PostgreSQL and 
+### This project moved from XIN-666 to move its hosting to heroku and use PostgreSQL 
 
 - [XIN-666](https://github.com/edenpark/xin-666/)
